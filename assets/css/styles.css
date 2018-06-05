@@ -4,10 +4,10 @@
 
 .button-container {
     display: inherit;
-    margin-bottom: 20px;
+    margin: 20px 0px;
 }
 
-.train-name {
+.train-line {
     cursor: pointer;
 }
 

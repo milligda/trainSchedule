@@ -95,7 +95,7 @@ $(document).ready(function() {
 
         populateTable(childSnapshot.val());
 
-        $("#destination-menu").empty();
+        // $("#destination-menu").empty();
 
         populateStopsDropdown(childSnapshot.val(), stopsArray);
 
@@ -104,16 +104,14 @@ $(document).ready(function() {
 
     function populateTable(train) {
 
-        var newRow = $('<tr>');
-        var nameTD = $('<td>');
-        var nameModalLink = $('<a class="train-name" data-toggle="modal">' + train.Name + '</a>');
-        nameModalLink.attr('data-target', '#trainSchedule' + train.id);
+        var newRow = $('<tr class="train-line" data-toggle="modal">');
+        newRow.attr('data-target', '#trainSchedule' + train.id)
+        var nameTD = $('<td>' + train.Name + '</td>');
         var finalStopTD = $('<td>' + train.destination + '</td>');
         var frequencyTD = $('<td>' + train.frequency + '</td>');
         var nextArrivalTD = $('<td>' + nextArrival + '</td>');
         var minutesAwayTD = $('<td>' + minutesAway + '</td>');
 
-        nameModalLink.appendTo(nameTD);
         nameTD.appendTo(newRow);
         finalStopTD.appendTo(newRow);
         frequencyTD.appendTo(newRow);
@@ -125,18 +123,18 @@ $(document).ready(function() {
 
     function populateStopsDropdown(train, stops) {
 
+        // for (var i = 0; i < stops.length; i++) {
+        //     allStops.push(stops[i]);
+        // }
+
+        // allStops.sort();
+
         for (var i = 0; i < stops.length; i++) {
-            allStops.push(stops[i]);
-        }
-
-        allStops.sort();
-
-        for (var i = 0; i < allStops.length; i++) {
             var trainStop = $("<button>");
             trainStop.addClass('dropdown-item');
             trainStop.attr('data-toggle', 'modal');
             trainStop.attr('data-target', '#trainSchedule' + train.id);
-            trainStop.text(allStops[i]);
+            trainStop.text(stops[i]);
             trainStop.appendTo("#destination-menu");
         }
     }
@@ -181,6 +179,7 @@ $(document).ready(function() {
     }
 
     $("#add-train-button").on("click", function() {
+
         $("#add-train-container").slideToggle("slow");
     });
 });
