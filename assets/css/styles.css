@@ -1,0 +1,47 @@
+.container {
+    padding-bottom: 150px;
+}
+
+.button-container {
+    display: inherit;
+    margin-bottom: 20px;
+}
+
+.train-name {
+    cursor: pointer;
+}
+
+#add-train-container {
+    display: none;
+}
+
+.next-train-time, .next-train-minutes {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.next-train-time {
+    font-weight: bold;
+}
+
+.next-train-minutes {
+    font-style: italic;
+}
+
+.train-stops {
+    font-weight: bold;
+    margin-bottom: 1px;
+}
+
+.train-stop {
+    margin-bottom: 0;
+}
+
+#destination-menu {
+    height: 200px;
+    overflow: auto;
+}
+
+.dropdown {
+    padding-right: 20px;
+}

@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -43,24 +44,24 @@
             </table>
         </div>
 
-        <div class="row">
-            <div class="col-md-12">
+        <div class="row justify-content-center">
+            <div class="col-md-12 button-container justify-content-center">
             
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
+                        Destinations
                     </button>
-                    <div class="dropdown-menu" id="destination-menu">
-                        <!-- <button class="dropdown-item" type="button">Action</button>
-                        <button class="dropdown-item" type="button">Another action</button>
-                        <button class="dropdown-item" type="button">Something else here</button> -->
-                    </div>
+                    <div class="dropdown-menu" id="destination-menu"></div>
                 </div>
+
+                <button type="button" class="btn btn-primary" id="add-train-button">
+                    Add Train Line 
+                </button>
 
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" id="add-train-container">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
@@ -96,6 +97,9 @@
                 </div>
             </div>
         </div>
+    
+        <div id="modal-container"></div>    
+    
     </div>
 
     <script type="text/javascript" src="assets/javascript/train-schedule.js"></script>
