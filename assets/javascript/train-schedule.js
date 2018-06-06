@@ -36,13 +36,14 @@ $(document).ready(function() {
 
         event.preventDefault();
 
-        //store the form inputs
+        //store the form inputs as variables
         trainLineName = $("#form-line-name").val().trim();
         trainDestination = $("#form-last-stop").val().trim();
         trainStops = $("#form-stops").val().trim();
         trainStartTime = $("#form-start-time").val().trim();
         trainFrequency = $("#form-frequency").val().trim();
 
+        // create a newTrainLine object to pass to the database
         newTrainLine = {
             Name: trainLineName,
             destination: trainDestination,
@@ -53,6 +54,7 @@ $(document).ready(function() {
             dateAdded: firebase.database.ServerValue.TIMESTAMP
         }
 
+        // push the newTrainLine object to the database
         database.ref().push(newTrainLine);
 
         // clear out the form values
@@ -63,55 +65,72 @@ $(document).ready(function() {
         $("#form-frequency").val("");
     });
 
+
     database.ref().on("child_added", function(childSnapshot) {
 
+        // console log the object that is returned from the database
         console.log(childSnapshot.val());
 
+        // store the train's stops as an array
+        var stopsArray = childSnapshot.val().stops.split(', ');
+
+        // store the train frequency and convert that to an integer
         var snapFrequency = childSnapshot.val().frequency;
         snapFrequency = parseInt(snapFrequency);
 
+        // store the train's start time and convert that to a moment time value
         var snapStartTime = childSnapshot.val().startTime;
-
         var convertedStart = moment(snapStartTime, 'HH:mm'); 
 
+        // calculate the difference in minutes between now and the train's start time
         var timeDifference = moment().diff(moment(convertedStart), "minutes");
 
+        // calculate the remainder of time between the timeDifference and the frequency
         var timeRemainder = timeDifference % snapFrequency;
 
+        // if we have not reached the start time 
         if (moment().diff(moment(convertedStart), "minutes") < 0) {
             
+            // set the minutes away to be the difference between now and the start time and set the next arrival as the start time
             minutesAway = Math.abs(timeDifference);
             nextArrival = convertedStart;
         
         } else {
 
+            // calculate the minutes away by subtracting the timeRemainder from the train frequency
+            // set the next arrival based on the minutesAway
             minutesAway = snapFrequency - timeRemainder;
             nextArrival = moment().add(minutesAway, "minutes");
         }
 
+        // format the nextArrival
         nextArrival = moment(nextArrival).format("h:mma");
 
-        var stopsArray = childSnapshot.val().stops.split(', ');
-
+        // call the populateTable function and pass it the train object
         populateTable(childSnapshot.val());
 
-        // $("#destination-menu").empty();
-
+        // call the populateStopsDropdown function and pass it the train object and the stopsArray
         populateStopsDropdown(childSnapshot.val(), stopsArray);
 
+        // call the populateTrainModal function and pass it the train object, nextArrival time, minutesAway and stopsArray
         populateTrainModal(childSnapshot.val(), nextArrival, minutesAway, stopsArray);
     });
 
+    // populates the table with the new train's information
     function populateTable(train) {
 
+        // create the new table row and assign it a data variable of the train id to call the corresponding modal
         var newRow = $('<tr class="train-line" data-toggle="modal">');
         newRow.attr('data-target', '#trainSchedule' + train.id)
+
+        // create the table data elements for the new row
         var nameTD = $('<td>' + train.Name + '</td>');
         var finalStopTD = $('<td>' + train.destination + '</td>');
         var frequencyTD = $('<td>' + train.frequency + '</td>');
         var nextArrivalTD = $('<td>' + nextArrival + '</td>');
         var minutesAwayTD = $('<td>' + minutesAway + '</td>');
 
+        // append the table data elements to the new row and then append the row to the table
         nameTD.appendTo(newRow);
         finalStopTD.appendTo(newRow);
         frequencyTD.appendTo(newRow);
@@ -121,14 +140,10 @@ $(document).ready(function() {
         newRow.appendTo("#train-schedule");
     }
 
+    // populates the stops dropdown with the stops for the new train
     function populateStopsDropdown(train, stops) {
 
-        // for (var i = 0; i < stops.length; i++) {
-        //     allStops.push(stops[i]);
-        // }
-
-        // allStops.sort();
-
+        // for each item in the stops array, create a button that will call the train's modal. Append that button to the dropdown menu
         for (var i = 0; i < stops.length; i++) {
             var trainStop = $("<button>");
             trainStop.addClass('dropdown-item');
@@ -139,8 +154,10 @@ $(document).ready(function() {
         }
     }
 
+    // create a modal for the new train line with the arrival information and stops 
     function populateTrainModal(train, nextArrival, minutesAway, stops) {
 
+        // creates the modal structure, sets its id based on the train's id and adds the name
         var trainModal = $('<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="trainSchedule' + train.id + '">');
         var modalDialog = $('<div class="modal-dialog modal-dialog-centered" role="document">');
         var modalContent = $('<div class="modal-content">');
@@ -151,23 +168,28 @@ $(document).ready(function() {
         modalCloseButton.text("x");
         var modalBody = $('<div class="modal-body">');
 
+        // add the time of the next train to the modal
         var modalNextTrain = $('<p class="next-train-time">');
         modalNextTrain.text('Next Train: ' + nextArrival);
         modalNextTrain.appendTo(modalBody);
 
+        // add the minutes until the next train to the modal
         var modalArrivalTime = $('<p class="next-train-minutes">');
         modalArrivalTime.text('arriving in ' + minutesAway + ' minutes');
         modalArrivalTime.appendTo(modalBody);
 
+        // add the train stops header to the modal
         var modalStopsHeader = $('<p class="train-stops">Stops:</p>');
         modalStopsHeader.appendTo(modalBody);
         
+        // add the train stops to the modal
         for (var i = 0; i < stops.length; i++) {
             var modalStop = $('<p class="train-stop">');
             modalStop.text(stops[i]);
             modalStop.appendTo(modalBody);
         }
 
+        // append all the pieces to construct the modal and then append the modal to the modal-container on the page
         modalCloseButton.appendTo(modalClose);
         modalTitle.appendTo(modalHeader);
         modalClose.appendTo(modalHeader);
@@ -178,6 +200,7 @@ $(document).ready(function() {
         trainModal.appendTo("#modal-container");
     }
 
+    // when the add-train-button is clicked, toggle the add-train form
     $("#add-train-button").on("click", function() {
 
         $("#add-train-container").slideToggle("slow");
