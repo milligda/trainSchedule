@@ -1,11 +1,8 @@
 $(document).ready(function() {
 
     // Initialize Firebase
-
-    var firebaseKey = configKeys.apiKey;
-
     var config = {
-        apiKey: firebaseKey,
+        apiKey: "AIzaSyDu5tHxLGB6UF6_PuvV4lbv1CVuNxGarnA",
         authDomain: "trainschedule-db51f.firebaseapp.com",
         databaseURL: "https://trainschedule-db51f.firebaseio.com",
         projectId: "trainschedule-db51f",

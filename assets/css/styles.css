@@ -1,5 +1,19 @@
+body {
+    background-color: #f2f2f2;
+}
+
 .container {
     padding-bottom: 150px;
+}
+
+.jumbotron {
+    background-color: #1C57B3;
+    color: #ffffff;
+}
+
+.card-header {
+    background-color: #1C57B3;
+    color: #fff;
 }
 
 .button-container {
