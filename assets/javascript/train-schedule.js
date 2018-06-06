@@ -24,6 +24,7 @@ $(document).ready(function() {
     var allStops = [];
     var nextArrival;
     var minutesAway;
+    var updatePeriod = 60 // in seconds
 
     // connect to the database on the page load and count the number of items in the database
     database.ref().on("value", function(snap) {
@@ -71,15 +72,35 @@ $(document).ready(function() {
         // console log the object that is returned from the database
         console.log(childSnapshot.val());
 
-        // store the train's stops as an array
-        var stopsArray = childSnapshot.val().stops.split(', ');
+        // call the addTrain function for adding a new train line to the page
+        addTrain(childSnapshot);
+    });
+
+    // function for adding a new train line to the page
+    function addTrain(childSnapshot) {
+
+        // call the calculateTimes function and pass it the train object
+        calculateTimes(childSnapshot.val());
+
+        // call the populateTable function and pass it the train object
+        populateTable(childSnapshot.val());
+
+        // call the populateStopsDropdown function and pass it the train object
+        populateStopsDropdown(childSnapshot.val());
+
+        // call the populateTrainModal function and pass it the train object
+        populateTrainModal(childSnapshot.val());
+    }
+
+    // calculates the minutes until the next train and the next arrival time
+    function calculateTimes(train) {
 
         // store the train frequency and convert that to an integer
-        var snapFrequency = childSnapshot.val().frequency;
+        var snapFrequency = train.frequency;
         snapFrequency = parseInt(snapFrequency);
 
         // store the train's start time and convert that to a moment time value
-        var snapStartTime = childSnapshot.val().startTime;
+        var snapStartTime = train.startTime;
         var convertedStart = moment(snapStartTime, 'HH:mm'); 
 
         // calculate the difference in minutes between now and the train's start time
@@ -105,16 +126,7 @@ $(document).ready(function() {
 
         // format the nextArrival
         nextArrival = moment(nextArrival).format("h:mma");
-
-        // call the populateTable function and pass it the train object
-        populateTable(childSnapshot.val());
-
-        // call the populateStopsDropdown function and pass it the train object and the stopsArray
-        populateStopsDropdown(childSnapshot.val(), stopsArray);
-
-        // call the populateTrainModal function and pass it the train object, nextArrival time, minutesAway and stopsArray
-        populateTrainModal(childSnapshot.val(), nextArrival, minutesAway, stopsArray);
-    });
+    }
 
     // populates the table with the new train's information
     function populateTable(train) {
@@ -141,7 +153,10 @@ $(document).ready(function() {
     }
 
     // populates the stops dropdown with the stops for the new train
-    function populateStopsDropdown(train, stops) {
+    function populateStopsDropdown(train) {
+
+        // store the train's stops as an array
+        var stops = train.stops.split(', ');
 
         // for each item in the stops array, create a button that will call the train's modal. Append that button to the dropdown menu
         for (var i = 0; i < stops.length; i++) {
@@ -155,7 +170,10 @@ $(document).ready(function() {
     }
 
     // create a modal for the new train line with the arrival information and stops 
-    function populateTrainModal(train, nextArrival, minutesAway, stops) {
+    function populateTrainModal(train) {
+
+        // store the train's stops as an array
+        var stops = train.stops.split(', ');
 
         // creates the modal structure, sets its id based on the train's id and adds the name
         var trainModal = $('<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="trainSchedule' + train.id + '">');
@@ -199,6 +217,31 @@ $(document).ready(function() {
         modalDialog.appendTo(trainModal);
         trainModal.appendTo("#modal-container");
     }
+
+    // setInterval for updating the nextArrival time and minutes until the next train
+    setInterval(function() {
+
+        // call the database once and return the entire database as a snapshot
+        database.ref().once('value', function(snapshot){
+
+            // empty the train-schedule and modal-container divs
+            $("#train-schedule").empty();
+            $("#modal-container").empty();
+
+            // cycle through each child in the snapshot
+            snapshot.forEach(function(childSnapshot) {
+
+                // calculate the new arrivalTime and minutesAway
+                calculateTimes(childSnapshot.val());
+
+                // repopulate the table with the updated arrivalTime and minutesAway
+                populateTable(childSnapshot.val());
+
+                // repopulate the train modals with the updated arrivalTime and minutesAway
+                populateTrainModal(childSnapshot.val());
+            });
+        });
+    }, 1000 * updatePeriod);
 
     // when the add-train-button is clicked, toggle the add-train form
     $("#add-train-button").on("click", function() {
