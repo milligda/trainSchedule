@@ -1,6 +1,17 @@
 $(document).ready(function() {
 
     // Initialize Firebase
+
+    var firebaseKey = configKeys.apiKey;
+
+    var config = {
+        apiKey: firebaseKey,
+        authDomain: "trainschedule-db51f.firebaseapp.com",
+        databaseURL: "https://trainschedule-db51f.firebaseio.com",
+        projectId: "trainschedule-db51f",
+        storageBucket: "",
+        messagingSenderId: "541274982192"
+    };
     
     firebase.initializeApp(config);
 
